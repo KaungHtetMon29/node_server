@@ -10,7 +10,6 @@ const knex= require('knex')({
         ssl:true}
 });
 const PORT =process.env.PORT|| 3000;
-require("dotenv").config();
 app.use(bodyparser.json());
 app.use(cors());
 // {
