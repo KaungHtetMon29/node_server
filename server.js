@@ -113,9 +113,13 @@ app.post('/register',(req,res)=>{
 app.get('/feeds',(req,res)=>{
     res.json(users[0].feed);
 })
+app.get('/',(req,res)=>{
+    res.json("success")
+})
 app.listen(3000,()=>{
     console.log("app is running on port 3000");
 })
+
 
 /*
 signin- fail or success post
