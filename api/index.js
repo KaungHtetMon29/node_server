@@ -9,6 +9,8 @@ const knex= require('knex')({
         connectionString:'postgres://kaunghtetmon456:hT5zRMt4QuvJ@ep-wandering-wildflower-295012.ap-southeast-1.aws.neon.tech/neondb',
         ssl:true}
 });
+const PORT =process.env.PORT|| 3000;
+require("dotenv").config();
 app.use(bodyparser.json());
 app.use(cors());
 // {
@@ -116,8 +118,8 @@ app.get('/feeds',(req,res)=>{
 app.get('/home',(req,res)=>{
     res.json("success")
 })
-app.listen(process.env.PORT,()=>{
-    console.log(process.env.PORT);
+app.listen(PORT,()=>{
+    console.log(PORT);
 })
 
 
