@@ -6,7 +6,7 @@ const knex= require('knex')({
     client:'pg',
     connection:
     {
-        connectionString:'postgres://kaunghtetmon456:hT5zRMt4QuvJ@ep-wandering-wildflower-295012.ap-southeast-1.aws.neon.tech/neondb',
+        connectionString:'postgres://kaunghtetmon456:pzrfcJ61Xsyk@ep-restless-snowflake-374626.ap-southeast-1.aws.neon.tech/neondb',
         ssl:true}
 });
 const PORT =process.env.PORT|| 3000;
