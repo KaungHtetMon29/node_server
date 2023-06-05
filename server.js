@@ -113,7 +113,7 @@ app.post('/register',(req,res)=>{
 app.get('/feeds',(req,res)=>{
     res.json(users[0].feed);
 })
-app.get('/',(req,res)=>{
+app.get('/home',(req,res)=>{
     res.json("success")
 })
 app.listen(3000,()=>{
