@@ -2,13 +2,11 @@ const express = require('express');
 const app=express();
 const bodyparser=require('body-parser');
 const cors=require('cors');
-require('dotenv').config();
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
     connection:
     {
-        connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+        connectionString:'postgres://kaunghtetmon456:hT5zRMt4QuvJ@ep-wandering-wildflower-295012.ap-southeast-1.aws.neon.tech/neondb',
         ssl:true}
 });
 const PORT =process.env.PORT|| 3000;
