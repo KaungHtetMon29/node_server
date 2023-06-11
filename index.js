@@ -6,14 +6,22 @@ require('dotenv').config();
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
-    connection:
-    {
-        connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-        ssl:true}
+    connection:{
+        
+        host:'127.0.0.1',
+        port:5432,
+        user:'postgres',
+        password:'test',
+        database:'socialmedia'
+    }
+    
 });
 const PORT =process.env.PORT|| 3000;
 app.use(bodyparser.json());
 app.use(cors());
+// {
+//     connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+//     ssl:true}
 // {
         
 //     host:'127.0.0.1',
@@ -35,14 +43,40 @@ const users=[
         feed: "Hi there! Nice to meet you all!. First time using social media. I am Kaung Htet!. I'm 21 years old wanna be tech guy"
     },
 ]
-var gname="";
-app.get('/profile',(req,res)=>{
-    if(gname===users[0].name){
-        res.json({name:users[0].name,feed:users[0].feed});
-    }
-    knex.select('*').from('indvusers').where({name:req})
+var frilist=[];
+var posts=[];
+app.post('/profile',(req,res)=>{
+    console.log(req.body)
+    knex.select('indvusers.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('indvusers').join('posts','indvusers.name','posts.name').where('indvusers.name',req.body.name).then(data=>{
+        //bf for buffer feeds
+        // let bf=[];
+        // let ids=[];
+        // let like=[];
+        // let haha=[];
+        // let love=[]
+
+        // data.map((f)=>{
+        //     like.push(f.lke)
+        //     haha.push(f.haha)
+        //     love.push(f.love)
+        //     bf.push(f.status)
+        //     ids.push(f.id)
+        // })
+       res.json({
+        data
+       });
+    })
+    // knex.select('name,feed').from('indvusers').innerJoin('feed','indvusers.name','feed.name').where('indvusers.name',req.body.name).then(data=>{
+    //     res.json(data);
+    // }).catch(err=>console.log(err)); 
+})
+app.get('/friposts',(req,res)=>{
+    knex.select('posts.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('friends').join('indvusers','friends.semail','indvusers.email').join('posts','indvusers.name','posts.name').then(data=>
+        res.json(data)
+    )
 })
 app.post('/signin',(req,res)=>{
+    
     // knex.select('*').from('indvusers').innerJoin('users','indvusers.email','users.email').where('users.email',req.body.email).where('users.pw',req.body.pw).then(data=>console.log(data))
     knex.select('indvusers.name').from('indvusers').innerJoin('users','indvusers.email','users.email').where('users.email',req.body.email).where('users.pw',String(req.body.pw)).then(data=>{
         if(data[0]!=undefined){
