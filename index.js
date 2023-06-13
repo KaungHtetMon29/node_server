@@ -70,8 +70,10 @@ app.post('/profile',(req,res)=>{
     //     res.json(data);
     // }).catch(err=>console.log(err)); 
 })
-app.get('/friposts',(req,res)=>{
-    knex.select('posts.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('friends').join('indvusers','friends.semail','indvusers.email').join('posts','indvusers.name','posts.name').then(data=>
+app.post('/friposts',(req,res)=>{
+    knex.select('posts.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('friends').join('indvusers','friends.semail','indvusers.email').join('posts','indvusers.name','posts.name')
+    .where('friends.pemail',req.body.name)
+    .then(data=>
         res.json(data)
     )
 })
@@ -147,8 +149,13 @@ app.post('/register',(req,res)=>{
     // })
    
 })
-app.get('/feeds',(req,res)=>{
-    res.json(users[0].feed);
+app.post('/feedupload',(req,res)=>{
+    if(req.body.post){
+        knex('posts').insert({name:req.body.name,status:req.body.post}).then(res.json("success"));
+    }else{
+        res.json("Type something in your mind")
+    }
+    
 })
 app.get('/home',(req,res)=>{
     res.json("success")
