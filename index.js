@@ -72,10 +72,16 @@ app.post('/profile',(req,res)=>{
 })
 app.post('/friposts',(req,res)=>{
     knex.select('posts.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('friends').join('indvusers','friends.semail','indvusers.email').join('posts','indvusers.name','posts.name')
-    .where('friends.pemail',req.body.name)
+    .where('friends.pemail',req.body.name).orderBy('posts.id')
     .then(data=>
         res.json(data)
     )
+})
+app.post('/cmt',(req,res)=>{
+    knex('comments').insert({cmter:req.body.cmter,postid:req.body.id,cmt:req.body.cmt}).then(data=>res.json(data));
+})
+app.post('/cmtupdate',(req,res)=>{
+    knex.select('cmtid','cmter','cmt').from('comments').where('postid',req.body.id).then(data=>res.json(data));
 })
 app.post('/signin',(req,res)=>{
     
@@ -97,7 +103,12 @@ app.post('/signin',(req,res)=>{
     //     res.json(false)
     // }
 })
-
+app.post('/reaction',(req,res)=>{
+    knex('posts').where('id',req.body.id).increment(req.body.react,1).then(data=>res.json(data))
+    .catch(err=>{
+       res.json('error');
+    })
+})
 app.post('/register',(req,res)=>{
     const {email,name,pw}=req.body;
     knex.transaction((trx)=>{
