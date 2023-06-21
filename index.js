@@ -3,11 +3,11 @@ const app=express();
 const bodyparser=require('body-parser');
 const cors=require('cors');
 require('dotenv').config();
+app.use(cors());
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
     connection:{
-        
     connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
     ssl:true}
     
