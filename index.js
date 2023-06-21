@@ -8,20 +8,16 @@ const knex= require('knex')({
     client:'pg',
     connection:{
         
-        host:'127.0.0.1',
-        port:5432,
-        user:'postgres',
-        password:'test',
-        database:'socialmedia'
-    }
+        connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    ssl:true}
     
 });
 const PORT =process.env.PORT|| 3000;
 app.use(bodyparser.json());
 app.use(cors());
 // {
-//     connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-//     ssl:true}
+    // connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    // ssl:true}
 // {
         
 //     host:'127.0.0.1',
