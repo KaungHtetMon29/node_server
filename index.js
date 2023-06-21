@@ -8,13 +8,13 @@ const knex= require('knex')({
     client:'pg',
     connection:{
         
-        connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
     ssl:true}
     
 });
 const PORT =process.env.PORT|| 3000;
 app.use(bodyparser.json());
-app.use(cors());
+
 // {
     // connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
     // ssl:true}
