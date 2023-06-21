@@ -4,12 +4,6 @@ const bodyparser=require('body-parser');
 const cors=require('cors');
 require('dotenv').config();
 app.use(cors());
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // You can also use "*" to allow all domains, but use it cautiously.
-    // res.setHeader('Access-Control-Allow-Origin', '*');
-    next();
-  });
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
@@ -48,7 +42,8 @@ const users=[
 var frilist=[];
 var posts=[];
 app.post('/profile',(req,res)=>{
-    console.log(req.body)
+    console.log(req.body);
+    res.setHeader('Access-Control-Allow-Origin', '*');
     knex.select('indvusers.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('indvusers').join('posts','indvusers.name','posts.name').where('indvusers.name',req.body.name).then(data=>{
         //bf for buffer feeds
         // let bf=[];
@@ -73,6 +68,7 @@ app.post('/profile',(req,res)=>{
     // }).catch(err=>console.log(err)); 
 })
 app.post('/friposts',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     knex.select('posts.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('friends').join('indvusers','friends.semail','indvusers.email').join('posts','indvusers.name','posts.name')
     .where('friends.pemail',req.body.name).orderBy('posts.id')
     .then(data=>
@@ -80,13 +76,15 @@ app.post('/friposts',(req,res)=>{
     )
 })
 app.post('/cmt',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     knex('comments').insert({cmter:req.body.cmter,postid:req.body.id,cmt:req.body.cmt}).then(data=>res.json(data));
 })
 app.post('/cmtupdate',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     knex.select('cmtid','cmter','cmt').from('comments').where('postid',req.body.id).then(data=>res.json(data));
 })
 app.post('/signin',(req,res)=>{
-    
+    res.setHeader('Access-Control-Allow-Origin', '*');
     // knex.select('*').from('indvusers').innerJoin('users','indvusers.email','users.email').where('users.email',req.body.email).where('users.pw',req.body.pw).then(data=>console.log(data))
     knex.select('indvusers.name').from('indvusers').innerJoin('users','indvusers.email','users.email').where('users.email',req.body.email).where('users.pw',String(req.body.pw)).then(data=>{
         if(data[0]!=undefined){
@@ -106,12 +104,14 @@ app.post('/signin',(req,res)=>{
     // }
 })
 app.post('/reaction',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     knex('posts').where('id',req.body.id).increment(req.body.react,1).then(data=>res.json(data))
     .catch(err=>{
        res.json('error');
     })
 })
 app.post('/register',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const {email,name,pw}=req.body;
     knex.transaction((trx)=>{
         return trx('users').insert({
@@ -163,6 +163,7 @@ app.post('/register',(req,res)=>{
    
 })
 app.post('/feedupload',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if(req.body.post){
         knex('posts').insert({name:req.body.name,status:req.body.post}).then(res.json("success"));
     }else{
@@ -171,6 +172,7 @@ app.post('/feedupload',(req,res)=>{
     
 })
 app.get('/home',(req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json("success")
 })
 app.listen(PORT,()=>{
