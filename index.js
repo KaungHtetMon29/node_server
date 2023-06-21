@@ -4,6 +4,12 @@ const bodyparser=require('body-parser');
 const cors=require('cors');
 require('dotenv').config();
 app.use(cors());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // You can also use "*" to allow all domains, but use it cautiously.
+    // res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+  });
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
