@@ -8,8 +8,12 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex= require('knex')({
     client:'pg',
     connection:{
-    connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-    ssl:true}
+        host:'127.0.0.1',
+    port:5432,
+    user:'postgres',
+    password:'test',
+    database:'socialmedia'
+}
     
 });
 const PORT =process.env.PORT|| 3000;
@@ -45,6 +49,17 @@ app.post('/profile',(req,res)=>{
     console.log(req.body);
     res.setHeader('Access-Control-Allow-Origin', '*');
     knex.select('indvusers.name','posts.status','posts.id','posts.lke','posts.haha','posts.love').from('indvusers').join('posts','indvusers.name','posts.name').where('indvusers.name',req.body.name).then(data=>{
+        if(data.length===0){
+            res.json({
+                data:{
+                    name:req.body.name
+                }
+            });
+        }else{
+            res.json({
+            data
+       });
+        }
         //bf for buffer feeds
         // let bf=[];
         // let ids=[];
@@ -59,9 +74,7 @@ app.post('/profile',(req,res)=>{
         //     bf.push(f.status)
         //     ids.push(f.id)
         // })
-       res.json({
-        data
-       });
+       
     })
     // knex.select('name,feed').from('indvusers').innerJoin('feed','indvusers.name','feed.name').where('indvusers.name',req.body.name).then(data=>{
     //     res.json(data);
