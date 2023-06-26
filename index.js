@@ -8,8 +8,11 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-    ssl: true,
+    host: "127.0.0.1",
+    port: 5432,
+    user: "postgres",
+    password: "test",
+    database: "socialmedia",
   },
 });
 const PORT = process.env.PORT || 3000;
@@ -91,6 +94,15 @@ app.post("/profile", (req, res) => {
   // knex.select('name,feed').from('indvusers').innerJoin('feed','indvusers.name','feed.name').where('indvusers.name',req.body.name).then(data=>{
   //     res.json(data);
   // }).catch(err=>console.log(err));
+});
+
+app.get("/allfriends", (req, res) => {
+  knex
+    .select("*")
+    .from("indvusers")
+    .then((data) => {
+      res.json(data);
+    });
 });
 app.post("/friposts", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
