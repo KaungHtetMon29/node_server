@@ -8,11 +8,8 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    port: 5432,
-    user: "postgres",
-    password: "test",
-    database: "socialmedia",
+    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    ssl: true,
   },
 });
 const PORT = process.env.PORT || 3000;
@@ -96,12 +93,13 @@ app.post("/profile", (req, res) => {
   // }).catch(err=>console.log(err));
 });
 
-app.get("/allfriends", (req, res) => {
+app.get("/viewfriends", (req, res) => {
   knex
     .select("*")
     .from("indvusers")
     .then((data) => {
       res.json(data);
+      console.log(data);
     });
 });
 app.post("/friposts", (req, res) => {
