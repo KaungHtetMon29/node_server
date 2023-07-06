@@ -19,7 +19,7 @@ const knex = require("knex")({
 });
 const io = new Server(server, {
   cors: {
-    origin: "https://kaung-book.vercel.app/",
+    origin: "*",
     // origin: "http://localhost:3001",
     methods: ["GET", "POST"],
   },
@@ -37,8 +37,7 @@ io.on("connection", (socket) => {
       .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
       .then((data) => {
         socket.emit("latestpost", data.rows);
-        // console.log(user);
-        console.log(user);
+        // console.log(user)
       });
 
     console.log("running");
