@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
       .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
       .then((data) => {
         socket.emit("latestpost", data.rows);
-        // console.log(user)
+        console.log(user);
       });
 
     console.log("running");
