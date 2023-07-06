@@ -13,16 +13,14 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    port: 5432,
-    user: "postgres",
-    password: "test",
-    database: "socialmedia",
+    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    ssl: true,
   },
 });
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "https://kaung-book.vercel.app/",
+    // origin: "http://localhost:3001",
     methods: ["GET", "POST"],
   },
 });
