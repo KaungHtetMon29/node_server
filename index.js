@@ -36,10 +36,7 @@ io.on("connection", (socket) => {
     pgClient
       .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
       .then((data) => {
-        if (data.rows[0].name !== user) {
-          socket.emit("latestpost", data.rows);
-        } else {
-        }
+        socket.emit("latestpost", data.rows);
         // console.log(user);
         console.log(user);
       });
@@ -179,7 +176,6 @@ app.post("/signin", (req, res) => {
     .then((data) => {
       if (data[0] != undefined) {
         res.json({ status: true, name: data[0].name });
-        user = data[0].name;
       } else {
         res.json({ status: false });
       }
