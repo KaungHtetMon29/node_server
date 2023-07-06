@@ -1,20 +1,55 @@
 const express = require("express");
-const app = express();
 const bodyparser = require("body-parser");
 const cors = require("cors");
+
+const app = express();
+const http = require("http");
+const { Server } = require("socket.io");
+
 require("dotenv").config();
 app.use(cors());
+const server = http.createServer(app);
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-    ssl: true,
+    host: "127.0.0.1",
+    port: 5432,
+    user: "postgres",
+    password: "test",
+    database: "socialmedia",
+  },
+});
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"],
   },
 });
 const PORT = process.env.PORT || 3000;
+const connection = knex.client.connectionSettings;
+const pgClient = new (require("pg").Client)(connection);
+pgClient.connect();
 app.use(bodyparser.json());
+var user = "";
+io.on("connection", (socket) => {
+  pgClient.on("notification", (notification) => {
+    // console.log(notification);
+    pgClient
+      .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
+      .then((data) => {
+        if (data.rows[0].name !== user) {
+          socket.emit("latestpost", data.rows);
+        } else {
+        }
+        // console.log(user);
+        console.log(user);
+      });
 
+    console.log("running");
+  });
+});
+pgClient.query("LISTEN updatepost");
 // {
 // connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
 // ssl:true}
@@ -32,18 +67,19 @@ app.use(bodyparser.json());
 // knex.select('indvusers.name').from('indvusers').join('users','indvusers.email','=','users.email').where({'users.email':'kaung@gmail.com','users.pw':'1234567'}).then(data=>{
 //     console.log(data[0])
 // })
-const users = [
-  {
-    name: "kaung",
-    pw: "123456",
-    feed: "Hi there! Nice to meet you all!. First time using social media. I am Kaung Htet!. I'm 21 years old wanna be tech guy",
-  },
-];
+// const users = [
+//   {
+//     name: "kaung",
+//     pw: "123456",
+//     feed: "Hi there! Nice to meet you all!. First time using social media. I am Kaung Htet!. I'm 21 years old wanna be tech guy",
+//   },
+// ];
 var frilist = [];
 var posts = [];
+
 app.post("/profile", (req, res) => {
-  //   console.log(req.body);
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  console.log(req.body);
+
   knex
     .select(
       "indvusers.name",
@@ -57,7 +93,7 @@ app.post("/profile", (req, res) => {
     .join("posts", "indvusers.name", "posts.name")
     .where("indvusers.name", req.body.name)
     .then((data) => {
-      if (data.length) {
+      if (data.length > 0) {
         console.log(data);
         res.json({
           data,
@@ -103,7 +139,6 @@ app.get("/viewfriends", (req, res) => {
     });
 });
 app.post("/friposts", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
   knex
     .select(
       "posts.name",
@@ -116,8 +151,8 @@ app.post("/friposts", (req, res) => {
     .from("friends")
     .join("indvusers", "friends.semail", "indvusers.email")
     .join("posts", "indvusers.name", "posts.name")
-    .where("friends.pemail", req.body.name)
-    .orderBy("posts.id")
+    .where("friends.pemail", req.body.email)
+    .orderBy("posts.id", "desc")
     .then((data) => res.json(data));
 });
 app.post("/cmt", (req, res) => {
@@ -127,7 +162,6 @@ app.post("/cmt", (req, res) => {
     .then((data) => res.json(data));
 });
 app.post("/cmtupdate", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
   knex
     .select("cmtid", "cmter", "cmt")
     .from("comments")
@@ -136,6 +170,7 @@ app.post("/cmtupdate", (req, res) => {
 });
 app.post("/signin", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  console.log(req.body);
   // knex.select('*').from('indvusers').innerJoin('users','indvusers.email','users.email').where('users.email',req.body.email).where('users.pw',req.body.pw).then(data=>console.log(data))
   knex
     .select("indvusers.name")
@@ -145,8 +180,8 @@ app.post("/signin", (req, res) => {
     .where("users.pw", String(req.body.pw))
     .then((data) => {
       if (data[0] != undefined) {
-        console.log(data[0]);
         res.json({ status: true, name: data[0].name });
+        user = data[0].name;
       } else {
         res.json({ status: false });
       }
@@ -175,7 +210,6 @@ app.post("/reaction", (req, res) => {
     });
 });
 app.post("/register", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
   const { email, name, pw } = req.body;
   knex.transaction((trx) => {
     return trx("users")
@@ -188,9 +222,11 @@ app.post("/register", (req, res) => {
           name: name,
           email: email,
         });
+        console.log(email);
       })
       .then(() => {
         trx.commit;
+        console.log("registered");
         res.json("users and indv update success");
       })
       .catch((err) => {
@@ -230,9 +266,9 @@ app.post("/register", (req, res) => {
 });
 app.post("/feedupload", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  if (req.body.post) {
+  if (req.body.status) {
     knex("posts")
-      .insert({ name: req.body.name, status: req.body.post })
+      .insert({ name: req.body.name, status: req.body.status })
       .then(res.json("success"));
   } else {
     res.json("Type something in your mind");
@@ -242,7 +278,11 @@ app.get("/home", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.json("success");
 });
-app.listen(PORT, () => {
+app.post("/liveupdate", (req, res) => {
+  io.emit("dataUpdate", updatedata);
+  res.send("successfull");
+});
+server.listen(PORT, () => {
   console.log(PORT);
 });
 
