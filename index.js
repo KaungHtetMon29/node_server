@@ -17,33 +17,32 @@ const knex = require("knex")({
     ssl: true,
   },
 });
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    // origin: "http://localhost:3001",
-    methods: ["GET", "POST"],
-  },
-});
+// const io = new Server(server, {
+//   cors: {
+//     origin: "*",
+//     // origin: "http://localhost:3001",
+//     methods: ["GET", "POST"],
+//   },
+// });
 const PORT = process.env.PORT || 3000;
 const connection = knex.client.connectionSettings;
 const pgClient = new (require("pg").Client)(connection);
 pgClient.connect();
 app.use(bodyparser.json());
-var user = "";
-io.on("connection", (socket) => {
-  pgClient.on("notification", (notification) => {
-    // console.log(notification);
-    pgClient
-      .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
-      .then((data) => {
-        socket.emit("latestpost", data.rows);
-        console.log(user);
-      });
+// var user = "";
+// io.on("connection", (socket) => {
+//   pgClient.on("notification", (notification) => {
+//     // console.log(notification);
+//     pgClient
+//       .query("SELECT * FROM posts ORDER BY id DESC LIMIT(1)")
+//       .then((data) => {
+//         socket.emit("latestpost", data.rows);
+//       });
 
-    console.log("running");
-  });
-});
-pgClient.query("LISTEN updatepost");
+//     console.log("running");
+//   });
+// });
+// pgClient.query("LISTEN updatepost");
 // {
 // connectionString:`postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
 // ssl:true}
@@ -275,7 +274,7 @@ app.post("/liveupdate", (req, res) => {
   io.emit("dataUpdate", updatedata);
   res.send("successfull");
 });
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(PORT);
 });
 
