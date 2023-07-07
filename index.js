@@ -199,7 +199,7 @@ app.post("/reaction", (req, res) => {
 });
 app.post("/register", (req, res) => {
   const { email, name, pw } = req.body;
-  knex.transaction((trx) => {
+  knex.transacttttttttttttttttttttttn((trx) => {
     return trx("users")
       .insert({
         email: email,
