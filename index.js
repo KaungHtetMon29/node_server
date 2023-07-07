@@ -10,11 +10,8 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    port: 5432,
-    user: "postgres",
-    password: "test",
-    database: "socialmedia",
+    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
+    ssl: true,
   },
 });
 // const io = new Server(server, {
