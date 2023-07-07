@@ -3,18 +3,18 @@ const bodyparser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const http = require("http");
-const { Server } = require("socket.io");
 
 require("dotenv").config();
 app.use(cors());
-const server = http.createServer(app);
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const knex = require("knex")({
   client: "pg",
   connection: {
-    connectionString: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
-    ssl: true,
+    host: "127.0.0.1",
+    port: 5432,
+    user: "postgres",
+    password: "test",
+    database: "socialmedia",
   },
 });
 // const io = new Server(server, {
@@ -26,8 +26,7 @@ const knex = require("knex")({
 // });
 const PORT = process.env.PORT || 3000;
 const connection = knex.client.connectionSettings;
-const pgClient = new (require("pg").Client)(connection);
-pgClient.connect();
+
 app.use(bodyparser.json());
 // var user = "";
 // io.on("connection", (socket) => {
@@ -270,10 +269,7 @@ app.get("/home", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.json("success");
 });
-app.post("/liveupdate", (req, res) => {
-  io.emit("dataUpdate", updatedata);
-  res.send("successfull");
-});
+
 app.listen(PORT, () => {
   console.log(PORT);
 });
